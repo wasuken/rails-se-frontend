@@ -1,4 +1,4 @@
-export default {
+const config = {
     mode: 'universal',
     /*
     ** Headers of the page
@@ -44,6 +44,7 @@ export default {
         'bootstrap-vue/nuxt',
         // Doc: https://axios.nuxtjs.org/usage
         '@nuxtjs/axios',
+        '@nuxtjs/proxy',
     ],
     /*
     ** Axios module configuration
@@ -62,3 +63,9 @@ export default {
         }
     }
 }
+
+if (process.env.NODE_ENV === 'development') {
+    config.proxy = { '/api': 'http://localhost:3000' }
+}
+
+export default config;
