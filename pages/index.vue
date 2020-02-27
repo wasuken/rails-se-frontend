@@ -1,5 +1,14 @@
 <template>
 <div class="container">
+  <b-form-checkbox
+    id="checkbox-1"
+    v-model="status"
+    name="checkbox-1"
+    value="accepted"
+    unchecked-value="not_accepted"
+    >
+    deep search
+  </b-form-checkbox>
   <b-input-group size="lg">
 	<template v-slot:prepend>
       <b-input-group-text>URL</b-input-group-text>
@@ -28,7 +37,8 @@ export default {
 	data: () => ({
 		texts: [],
 		url: "",
-		query: ""
+		query: "",
+		status: "",
 	}),
 	methods: {
 		addClick: function(){
@@ -37,6 +47,9 @@ export default {
 				return;
 			}
 			let body = 'url=' + this.url;
+			if(this.status === "accepted"){
+				body += "&t=deep"
+			}
 			fetch("/api/v1/text", {
 				method: "POST",
 				headers: {
@@ -44,13 +57,18 @@ export default {
 				},
 				body: body
 			}).then(resp => console.log(resp))
-			.then(r => this.url = "");
-			this.syncTexts();
+				.then(r => this.url = "")
+				.then(r => this.syncTexts());
+
 		},
 		searchClick: function(){
+			this.texts = [];
 			fetch("/api/v1/text?q=" + this.query)
 				.then(resp => resp.json())
-				.then(json => (this.texts = json.data));
+				.then(json => {
+					console.log(json);
+					this.texts = json.data;
+				});
 		},
 		syncTexts: function(){
 			fetch("/api/v1/text")
@@ -59,7 +77,7 @@ export default {
 		}
 	},
 	mounted: function() {
-		setInterval(() => this.syncTexts(), 10000);
+		setTimeout(() => this.syncTexts(), 3000);
 	}
 }
 </script>
