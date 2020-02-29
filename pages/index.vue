@@ -1,6 +1,6 @@
 <template>
 <div class="container">
-  <b-form-group label="Individual radios">
+  <b-form-group label="add type">
 	<b-form-radio checked v-model="status" name="some-radios" value="single">url single</b-form-radio>
     <b-form-radio v-model="status" name="some-radios" value="deep">url deep</b-form-radio>
 	<b-form-radio v-model="status" name="some-radios" value="zip">file zip</b-form-radio>
@@ -40,11 +40,20 @@
   </b-input-group>
 
   <h3>追加されたリンク一覧</h3>
-  <ul v-for="text in texts">
+  <ul v-for="(text, i) in texts">
     <li>
-	  {{text.title}}({{ text.url }})
+	  <b-link href="javascript:void(0)" @click="$bvModal.show('modal' + i)">
+		{{text.title}}
+	  </b-link>
+	  <b-modal :id="'modal' + i" :title="text.title">
+		{{text.contents}}
+	  </b-modal>
 	</li>
   </ul>
+
+  <hr/>
+
+
 </div>
 </template>
 
