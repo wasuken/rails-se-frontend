@@ -1,21 +1,36 @@
 <template>
 <div class="container">
-  <b-form-checkbox
-    id="checkbox-1"
-    v-model="status"
-    name="checkbox-1"
-    value="accepted"
-    unchecked-value="not_accepted"
-    >
-    deep search
-  </b-form-checkbox>
-  <b-input-group size="lg">
-	<template v-slot:prepend>
-      <b-input-group-text>URL</b-input-group-text>
-    </template>
-    <b-form-input v-model="url" type="url"></b-form-input>
-	<b-button variant="success" v-on:click="addClick">Add</b-button>
-  </b-input-group>
+  <b-form-group label="Individual radios">
+	<b-form-radio checked v-model="status" name="some-radios" value="single">url single</b-form-radio>
+    <b-form-radio v-model="status" name="some-radios" value="deep">url deep</b-form-radio>
+	<b-form-radio v-model="status" name="some-radios" value="zip">file zip</b-form-radio>
+  </b-form-group>
+
+  <div v-if="status === 'zip'">
+	<b-input-group size="lg">
+	  <template v-slot:prepend>
+		<b-input-group-text>File</b-input-group-text>
+      </template>
+      <b-form-file
+		v-model="file"
+		:state="Boolean(file)"
+		placeholder="Choose a file or drop it here..."
+		drop-placeholder="Drop file here..."
+		></b-form-file>
+	  <b-button variant="success" v-on:click="fileUploadClick">Upload</b-button>
+	</b-input-group>
+  </div>
+
+  <div v-else>
+	<b-input-group size="lg">
+	  <template v-slot:prepend>
+		<b-input-group-text>URL</b-input-group-text>
+      </template>
+      <b-form-input v-model="url" type="url"></b-form-input>
+	  <b-button variant="success" v-on:click="addClick">Add</b-button>
+	</b-input-group>
+  </div>
+
   <b-input-group size="lg">
 	<template v-slot:prepend>
       <b-input-group-text>Query</b-input-group-text>
@@ -23,6 +38,7 @@
     <b-form-input v-model="query" type="text"></b-form-input>
 	<b-button variant="success" v-on:click="searchClick">Search</b-button>
   </b-input-group>
+
   <h3>追加されたリンク一覧</h3>
   <ul v-for="text in texts">
     <li>
@@ -38,7 +54,8 @@ export default {
 		texts: [],
 		url: "",
 		query: "",
-		status: "",
+		status: "single",
+		file: null,
 	}),
 	methods: {
 		addClick: function(){
@@ -47,9 +64,7 @@ export default {
 				return;
 			}
 			let body = 'url=' + this.url;
-			if(this.status === "accepted"){
-				body += "&t=deep"
-			}
+			body += "&t=" + this.status;
 			fetch("/api/v1/text", {
 				method: "POST",
 				headers: {
@@ -59,7 +74,6 @@ export default {
 			}).then(resp => console.log(resp))
 				.then(r => this.url = "")
 				.then(r => this.syncTexts());
-
 		},
 		searchClick: function(){
 			this.texts = [];
@@ -74,6 +88,17 @@ export default {
 			fetch("/api/v1/text")
 				.then(resp => resp.json())
 				.then(json => (this.texts = json.data));
+		},
+		fileUploadClick: function(){
+			var formData = new FormData();
+			formData.append('file', this.file);
+			formData.append('t', this.status);
+			fetch("/api/v1/text", {
+				method: "POST",
+				body: formData
+			}).then(resp => console.log(resp))
+				.then(r => this.file = null)
+				.then(r => this.syncTexts());
 		}
 	},
 	mounted: function() {
