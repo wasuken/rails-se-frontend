@@ -1,6 +1,8 @@
 # rails-se-frontend
 
-> My awe-inspiring Nuxt.js project
+[wasuken/rails-se](https://github.com/wasuken/rails-se)
+
+nuxt frontend.
 
 ## Build Setup
 
@@ -18,5 +20,3 @@ $ yarn start
 # generate static project
 $ yarn generate
 ```
-
-For detailed explanation on how things work, check out [Nuxt.js docs](https://nuxtjs.org).
